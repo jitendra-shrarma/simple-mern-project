@@ -2,9 +2,11 @@
   "name": "server",
   "version": "1.0.0",
   "description": "user management with nodejs api's and reactjs frontend",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+
   },
   "keywords": [
     "nodejs",
@@ -13,6 +15,15 @@
   "author": "jitendra sharma",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.17.2"
+    "axios": "^0.24.0",
+    "body-parser": "^1.19.1",
+    "bootstrap": "^4.6.0",
+    "cors": "^2.8.5",
+    "express": "^4.17.2",
+    "mongoose": "^6.1.5",
+    "react-redux": "^7.2.6",
+    "react-router-dom": "^6.2.1",
+    "redux": "^4.1.2",
+    "redux-thunk": "^2.4.1"
   }
 }
