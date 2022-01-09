@@ -11,6 +11,7 @@ export default class UsersList extends React.Component {
 		super(props);
 		this.state = {users: []};
 		this.getUsers();
+		setInterval(this.getUsers, 5000);
 	}
 
 	setUsers = (data) => {
@@ -29,6 +30,7 @@ export default class UsersList extends React.Component {
 	}
 	
 	addUser = (user) => {
+		console.log("add user", user);
 		UserDataService.create(user)
 			.then((response) => {
 				console.log(response.data);
@@ -40,16 +42,16 @@ export default class UsersList extends React.Component {
 				console.log(e);
 			}
 		);
-		console.log("added user", user);
 	}
 
-	removeUser = (id) => {
-		if (id) {
-			UserDataService.remove(id)
+	removeUser = (user) => {
+		console.log("remove user", user);
+		if (user.id) {
+			UserDataService.remove(user.id)
 				.then((response) => {
 					this.setState((prevState, props) => {
 						prevState.users.splice(prevState.users.findIndex(
-							user => user.id === id
+							u => u.id === user.id
 						), 1);
 						return prevState;
 					})		
@@ -59,7 +61,6 @@ export default class UsersList extends React.Component {
 				}
 			);
 		}
-		console.log("removed user", this.state.users)
 	}
 
 	renderUser(user, index) {
@@ -89,7 +90,7 @@ export default class UsersList extends React.Component {
 									/>
 									<RemoveUserButton 
 										variant="danger"
-										handleFormData={(data) => this.removeUser(data.id)}
+										handleFormData={this.removeUser}
 									/>
 								</Stack>
 							</Col>

@@ -1,33 +1,57 @@
 import React, {Component} from "react";
-import {FormControl, Modal, Button, Container, Row, InputGroup} from 'react-bootstrap';
+import {FormControl, Modal, Button, Form} from 'react-bootstrap';
 
-class RemoveUserButton extends Component {
+export default class RemoveUserButton extends Component {
 	constructor(props) {
 		super(props);
-		this.state = {id: "", isOpen: false};
+		this.state = {
+			user: {
+				id: "",
+			},
+			isOpen: false,
+			isValidated: true,
+			errors: {
+				id: "",
+			}
+		};
 	}
-
 	openModal = () => {this.setState({ isOpen: true })};
 	closeModal = () => {
-		this.setState({ id: ""});
+		this.setState({ user: {id: "" }});
+		this.setState({ isValidated: true});
+		this.setState({ errors: {id: ""}});
 		this.setState({ isOpen: false });
 	};
-	
-	handleInputChange = (event) => {
+
+	handleInput = (event) => {
 		const { name, value } = event.target;
-		this.setState({[name]: value });
+		this.setState({user: {[name]: value }});
 	}
 
-	clearForm = () => {
-		Array.from(document.querySelectorAll("input")).forEach(input => (input.value = ""));
+	validateForm = () => {
+		let id = this.state.user.id;
+		let pattern = /^[\d\w]{24}$/i;
+		this.state.isValidated = false;
+		if ( !id ){
+			this.setState({errors: {id: "user's id invalid!"}});
+		} else if ( !id.match(pattern) ) {
+			this.setState({errors: {id: "user's id length must be equal 24."}});
+		} else {
+			this.state.isValidated = true;
+		}
 	}
-
-	submitForm = () => {
-		const data = this.state;
-		this.clearForm();
-		this.closeModal();
-		delete data.isOpen;
-		this.props.handleFormData ? this.props.handleFormData(data) : console.log(data);
+	
+	handleSubmit = (event) => {
+		this.validateForm();
+		console.log(this.state.isValidated);
+		if ( !this.state.isValidated ){
+			event.preventDefault();
+      		event.stopPropagation();
+		} else {
+			const data = this.state.user;
+			this.closeModal();
+			this.props.handleFormData ? this.props.handleFormData(data) : console.log(data);
+		}
 	}
 
   	render(){
@@ -38,42 +62,42 @@ class RemoveUserButton extends Component {
 					show={this.state.isOpen} 
 					onHide={this.closeModal}
 				>
-					<Modal.Header closeButton>
-						<Modal.Title>Remove User</Modal.Title>
-					</Modal.Header>
-					<Modal.Body>
-						<Container>
-							<Row>
-								<InputGroup className="mb-3">
-									<InputGroup.Text id="id" className="col-3">User ID</InputGroup.Text>
-									<FormControl
-										name="id"
-										type="text"
-										onChange={this.handleInputChange}
-										value={this.state.id}
-										placeholder="User ID"
-									/>
-								</InputGroup>
-							</Row>
-						</Container>
-					</Modal.Body>
-					<Modal.Footer>
-						<Button variant="primary" type="submit" onClick={this.submitForm}>
-							Remove User
-						</Button>
-						<Button variant="secondary" type="button" onClick={this.closeModal}>
-							Close
-						</Button>
-					</Modal.Footer>
+					<Form  onSubmit={this.handleSubmit} validated={this.state.isValidated} noValidate>
+						<Modal.Header closeButton>
+							<Modal.Title>Remove User</Modal.Title>
+						</Modal.Header>
+						<Modal.Body>
+							<Form.Group controlId="validationRemoveUserID">
+								<Form.Label>User ID</Form.Label>
+								<FormControl
+									name="id"
+									type="text"
+									value={this.state.user.id}
+									placeholder="User ID"
+									onChange={this.handleInput}
+									required
+									isInvalid
+								/>
+								<Form.Control.Feedback type="invalid">
+									{this.state.errors.id}
+								</Form.Control.Feedback>
+							</Form.Group>
+						</Modal.Body>
+						<Modal.Footer>
+							<Button variant="primary" type="submit">
+								Remove User
+							</Button>
+							<Button variant="secondary" type="button" onClick={this.closeModal}>
+								Close
+							</Button>
+						</Modal.Footer>
+					</Form>
 				</Modal> 
 			: 
-				this.clearForm() && null
+				null
 			}
 			<Button variant={this.props.variant} onClick={this.openModal}>Remove User</Button>
 		</div>
     	)
 	}
-}
-
-
-export default RemoveUserButton;
+};

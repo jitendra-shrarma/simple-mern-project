@@ -1,36 +1,85 @@
 import React, {Component} from "react";
-import {FormControl, Modal, Button, Container, Row, Col, InputGroup} from 'react-bootstrap';
+import {FormControl, Modal, Button, Form} from 'react-bootstrap';
 
 class AddUserButton extends Component {
 	constructor(props) {
 		super(props);
-		this.state = {name: "", email: "", address: "", joining_date: "", isOpen: false};
+		this.state = {
+			user: {
+				name: "",
+				email: "",
+				address: "",
+				joining_date: "",
+			},
+			isOpen: false,
+			isValidated: true,
+			errors: {
+				name: "",
+				email: "",
+				address: "",
+				joining_date: "",
+			}
+		};
 	}
 	
 	openModal = () => {this.setState({ isOpen: true })};
   	closeModal = () => {
-		this.setState({ name: "" });
-		this.setState({ email: "" });
-		this.setState({ address: "" });
-		this.setState({ joining_date: "" });
+		this.setState({ user: { 
+			name: "", 
+			email: "",
+			address: "", 
+			joining_date: "",
+		} });
+		this.setState({ errors: {
+			name: "", 
+			email: "",
+			address: "", 
+			joining_date: "",
+		} });
+		this.setState({ isValidated: true });
 		this.setState({ isOpen: false });
 	};
 
-	handleInputChange = (event) => {
+	handleInput = (event) => {
 		const { name, value } = event.target;
-		this.setState({[name]: value });
+		this.setState({ user: {...this.state.user, [name]: value } });
 	}
 
-	clearForm = () => {
-		Array.from(document.querySelectorAll("input")).forEach(input => (input.value = ""));
+	validateForm = () => {
+		let user = this.state.user;
+		let pattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+		this.state.isValidated = true;
+		console.log(this.state.user);
+		if ( !user.name ){
+			this.state.errors.name = "name is invalid!";
+			this.state.isValidated = false;
+		}
+		if ( !user.email || !user.email.match(pattern) ){
+			this.state.errors.email = "email is invalid!";
+			this.state.isValidated = false;
+		}
+		if ( !user.address ){
+			this.state.errors.address = "address is invalid!";
+			this.state.isValidated = false;
+		}
+		if ( !user.joining_date ){
+			this.state.errors.joining_date = "date is invalid!";
+			this.state.isValidated = false;
+		}
+		console.log(this.state.errors, this.state.isValidated);
 	}
 
-	submitForm = () => {
-		const data = this.state;
-		this.clearForm();
-		this.closeModal();
-		delete data.isOpen;
-		this.props.handleFormData ? this.props.handleFormData(data) : console.log(data);
+	handleSubmit = (event) => {
+		this.validateForm();
+		console.log(this.state.isValidated);
+		if ( !this.state.isValidated ){
+			event.preventDefault();
+      		event.stopPropagation();
+		} else {
+			const data = this.state.user;
+			this.closeModal();
+			this.props.handleFormData ? this.props.handleFormData(data) : console.log(data);
+		}
 	}
 
   	render(){
@@ -41,71 +90,84 @@ class AddUserButton extends Component {
 					show={this.state.isOpen} 
 					onHide={this.closeModal}
 				>
-					<Modal.Header closeButton>
-						<Modal.Title>Add User</Modal.Title>
-					</Modal.Header>
-					<Modal.Body>
-						<Container>
-							<Row>
-								<InputGroup className="mb-3">
-									<InputGroup.Text id="name" className="col-3">Name</InputGroup.Text>
-									<FormControl
-										name="name"
-										type="text"
-										onChange={this.handleInputChange}
-										value={this.state.name}
-										placeholder="User's Name"
-									/>
-								</InputGroup>
-							</Row>
-							<Row>
-								<InputGroup className="mb-3">
-									<InputGroup.Text id="email" className="col-3">Email</InputGroup.Text>
-									<FormControl
-										name="email"
-										type="email"
-										onChange={this.handleInputChange}
-										value={this.state.email}
-										placeholder="User's Email ID"
-									/>
-								</InputGroup>
-							</Row>
-							<Row>
-								<InputGroup className="mb-3">
-									<InputGroup.Text id="address" className="col-3">Address</InputGroup.Text>
-									<FormControl
-										name="address"
-										type="text"
-										onChange={this.handleInputChange}
-										value={this.state.address}
-										placeholder="User's Address"
-									/>
-								</InputGroup>
-							</Row>
-							<Row>
-								<InputGroup className="mb-3">
-									<InputGroup.Text id="joining_date" className="col-3">Joining Date</InputGroup.Text>
-									<FormControl
-										name="joining_date"
-										type="datetime-local"
-										onChange={this.handleInputChange}
-										value={this.state.joining_date}
-									/>
-								</InputGroup>
-							</Row>
-						</Container>
-					</Modal.Body>
-					<Modal.Footer>
-						<Button variant="primary" type="submit" onClick={this.submitForm}>
-							Add User
-						</Button>
-						<Button variant="secondary" type="button" onClick={this.closeModal}>
-							Close
-						</Button>
-					</Modal.Footer>
+					<Form  onSubmit={this.handleSubmit} validated={this.state.isValidated} noValidate>
+						<Modal.Header closeButton>
+							<Modal.Title>Add User</Modal.Title>
+						</Modal.Header>
+						<Modal.Body>
+							<Form.Group>
+								<Form.Label>Name</Form.Label>
+								<FormControl
+									name="name"
+									type="text"
+									value={this.state.user.name}
+									placeholder="User's Name"
+									onChange={this.handleInput}
+									required
+									isInvalid
+								/>
+								<Form.Control.Feedback type="invalid">
+									{this.state.errors.name}
+								</Form.Control.Feedback>
+							</Form.Group>
+							<Form.Group>
+								<Form.Label>Email</Form.Label>
+								<FormControl
+									name="email"
+									type="email"
+									value={this.state.user.email}
+									placeholder="User's Email ID"
+									onChange={this.handleInput}
+									required
+									isInvalid
+								/>
+								<Form.Control.Feedback type="invalid">
+									{this.state.errors.email}
+								</Form.Control.Feedback>
+							</Form.Group>
+							<Form.Group>
+								<Form.Label>Address</Form.Label>
+								<FormControl
+									name="address"
+									type="text"
+									value={this.state.user.address}
+									placeholder="User's Address"
+									onChange={this.handleInput}
+									required
+									isInvalid
+								/>
+								<Form.Control.Feedback type="invalid">
+									{this.state.errors.address}
+								</Form.Control.Feedback>
+							</Form.Group>
+							<Form.Group>
+								<Form.Label>Joining Date</Form.Label>
+								<FormControl
+									name="joining_date"
+									type="date"
+									value={this.state.user.joining_date}
+									onChange={this.handleInput}
+									required
+									isInvalid
+								/>
+								<Form.Control.Feedback type="invalid">
+									{this.state.errors.joining_date}
+								</Form.Control.Feedback>
+							</Form.Group>
+						
+						</Modal.Body>
+						<Modal.Footer>
+							<Button variant="primary" type="submit" onClick={this.handleSubmit}>
+								Add User
+							</Button>
+							<Button variant="secondary" type="button" onClick={this.closeModal}>
+								Close
+							</Button>
+						</Modal.Footer>
+					</Form>
 				</Modal> 
 			: 
-				this.clearForm() && null
+				null
 			}
 			<Button variant={this.props.variant} onClick={this.openModal}>Add User</Button>
 		</div>
