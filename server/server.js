@@ -1,30 +1,32 @@
 const express = require("express");
+const cors = require("cors");
+const bodyParser = require("body-parser");
+
+var corsOptions = {origin: "http://localhost:3000"};
 const app = express();
-const dbConfig = require("./connection");
-const mongoose = require("mongoose");
+app.use(cors(corsOptions));
+app.use(bodyParser.json());                         // parse requests of content-type - application/json
+app.use(bodyParser.urlencoded({ extended: true })); // parse requests of content-type - application/x-www-form-urlencoded
 
-const db = {};
-db.mongoose = mongoose;
-db.url = dbConfig.db_url;
-
-
+const db = require("./app/models");
 db.mongoose
     .connect(db.url, {
         useNewUrlParser: true,
         useUnifiedTopology: true
     })
     .then(() => {
-        console.log("Connected");
+        console.log("Connected to the database!");
     })
     .catch(err => {
-        console.log("Cannot connect", err);
+        console.log("Cannot connect to the database!", err);
         process.exit();
     }
 );
 
+require("./app/routes/user.routes")(app);
 
 app.get("/", (req, res) => {
-    res.json({ message: "working api"});
+    res.json({ message: "User RestAPI."});
 });
 
 const PORT = process.env.PORT || 5000;

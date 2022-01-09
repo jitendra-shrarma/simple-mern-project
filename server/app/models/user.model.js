@@ -7,8 +7,6 @@ var UserSchema = new mongoose.Schema({
     email : String,
     address : String,
     joining_date : Date
-}, {
-    timestamps: true
 });
 
 UserSchema.method("toJSON", function() {

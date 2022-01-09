@@ -10,7 +10,11 @@
   },
   "keywords": [
     "nodejs",
-    "reactjs"
+    "express",
+    "moongodb",
+    "react",
+    "rest",
+    "api"
   ],
   "author": "jitendra sharma",
   "license": "ISC",
