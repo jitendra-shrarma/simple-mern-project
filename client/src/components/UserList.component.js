@@ -1,7 +1,7 @@
 import React from "react";
 import UserDataService from "../services/user.service";
 
-import {Container, Row, Col, Stack, Table} from "react-bootstrap";
+import {Container, Row, Col, Stack, Table, Button} from "react-bootstrap";
 import AddUserButton from "./AddUserModel.component";
 import RemoveUserButton from "./RemoveUserModel.component";
 
@@ -62,17 +62,22 @@ export default class UsersList extends React.Component {
 			);
 		}
 	}
-
-	renderUser(user, index) {
+	
+	renderUser(user) {
 		let joining_date = new Date(user.joining_date).toLocaleString();
 		return (
-		  	<tr key={user.id}>
+			<tr key={user.id}>
 				<td>{user.id}</td>
 				<td>{user.name}</td>
 				<td>{user.email}</td>
 				<td>{user.address}</td>
 				<td>{joining_date}</td>
-		  	</tr>
+				<td>
+					<Button variant="danger" type="button" onClick={() => this.removeUser(user) }>
+						Remove
+					</Button>
+				</td>
+			</tr>
 		)
 	}
 
@@ -106,10 +111,11 @@ export default class UsersList extends React.Component {
 								<th>Email</th>
 								<th>Address</th>
 								<th>Joining Date</th>
+								<th>Action</th>
 							</tr>
 						</thead>
 						<tbody>
-							{this.state.users.map(this.renderUser)}
+							{this.state.users.map(user => this.renderUser(user))}
 						</tbody>
 					</Table>
 				</Container>
